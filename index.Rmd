@@ -1,0 +1,94 @@
+--- 
+title: "MyWebSite"
+author: "Giuseppa Cefalu"
+date: "2025-02-12"
+output: html_document
+---
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r libraries, echo = FALSE}
+library(leaflet)
+library(sf)
+library(leaflet.extras)
+```
+---
+title: "Italy"
+---
+
+My Map of Italy!
+
+```{r Iconlist, echo = FALSE}
+
+# This script is based on 
+# https://r-charts.com/spatial/interactive-maps-leaflet/
+
+```
+```{r data, echo = FALSE}
+
+# Read a Geojson or shapefile
+data_map <- read_sf("https://raw.githubusercontent.com/R-CoderDotCom/data/main/sample_geojson.geojson")
+#data_map <- st_transform(data_map, crs = '+proj=longlat +datum=WGS84')
+data_map2 <- read_sf("C:/Users/Giuseppa/Downloads/italy_Italy_Country_Boundary.geojson/italy_Italy_Country_Boundary.geojson")
+data_map3 <- read_sf("https://rstudio.github.io/leaflet/json/countries.geojson")
+data_map
+
+
+```
+```{r, colorpalate, echo = FALSE}
+# Create a continuous palette function
+pal <- colorNumeric(palette = "viridis", domain = data_map3$gdp_md_est)
+```
+
+
+
+```{r circles, echo = FALSE}
+#Circle markers
+circles <- data.frame(lng = c(12.5, 14.3, 11.234),
+                      lat = c(42, 41, 43.84))
+
+# Data
+iconData <- data.frame(lng = c(12.5, 12.453389, 11.234),
+                 lat = c(42,  41.902916 , 43.84),
+                 group = c("A", "B", "A")#,
+)
+
+# Icons for the regions of Toscana and Napoli, and for Fonte Nuova in Rome
+icons_list <- icons(iconUrl = ifelse(iconData$group == "A", 
+                     'https://raw.githubusercontent.com/R-CoderDotCom/samples/main/marker.png',
+                     ifelse(iconData$group == "B", "https://raw.githubusercontent.com/R-CoderDotCom/chinchet/main/inst/red.png", NA)),
+                     iconWidth = c(50, 90, 40), iconHeight = c(50, 90, 40))
+``` 
+```{r population, echo = FALSE}
+  mypalette <- colorNumeric(
+  palette = "viridis", domain = data_map$tot_pob,
+  na.color = "transparent"
+)
+
+```
+
+```{r italy, echo = FALSE}
+   map <- leaflet() %>%
+   addTiles() %>%
+   setView(lng = 12.496366 , lat = 41.902782, zoom = 5) %>% 
+   addMarkers(lng = 12.57, lat =41.87,
+          popup = "Welcome to Rome") %>%
+   addCircleMarkers(data = circles, color = "red") %>%
+   addCircles(data = circles, radius = 2000,  color = "blue",  opacity = 1,
+            fillColor = "yellow", fillOpacity = 0.25) %>%
+   addMarkers(data = iconData, icon = icons_list)  %>%
+   addMiniMap(width = 150, height = 150) %>%
+   addPolygons(data = data_map2, color = "blue", stroke = 1, opacity = 0.8) %>%
+   addPolygons(data = data_map3, color = pal(data_map3$gdp_md_est), stroke = 1, opacity = 0.8) %>%
+   addPolygons(data = data_map, fillColor = ~ mypalette(tot_pob), stroke = FALSE)
+  
+   
+   map
+
+```
+
+
+
+
+
