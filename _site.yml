@@ -1,0 +1,8 @@
+name: "my_web_site"
+navbar:
+  title: "Map"
+  left:
+    - text: "My Website"
+      href: index.html
+    - text: "About this Website"
+      href: about.html
